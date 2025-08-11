@@ -10,6 +10,8 @@ By doing so, it's basically as if we emulate a minimalist Android environment in
 ## Notes
 
 - The loader has been tested with v.1.15.20 of the game.
+- The game has framedrops and stutters which is why the release version is v.0.x.
+- Physical controls are implemented: Left/Right moves the bike, L Trigger breaks and R Trigger uses nitro.
 
 ## Changelog
 
