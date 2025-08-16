@@ -68,8 +68,6 @@ static char data_path[256];
 static char fake_vm[0x1000];
 static char fake_env[0x1000];
 
-int framecap = 0;
-
 int file_exists(const char *path) {
 	SceIoStat stat;
 	return sceIoGetstat(path, &stat) >= 0;
@@ -1046,7 +1044,7 @@ int sceLibcBridge_fseeko(FILE *stream, off_t offset, int origin) {
 }
 
 off_t sceLibcBridge_ftello(FILE *stream) {
-	return ftell(stream);
+	return sceLibcBridge_ftell(stream);
 }
 
 static so_default_dynlib default_dynlib[] = {
@@ -1682,9 +1680,7 @@ int CallBooleanMethodV(void *env, void *obj, int methodID, uintptr_t *args) {
 	}
 }
 
-char duration[32];
 void *CallObjectMethodV(void *env, void *obj, int methodID, uintptr_t *args) {
-	int lang = -1;
 	switch (methodID) {
 	default:
 		return 0x34343434;
@@ -1783,7 +1779,7 @@ Mix_Music *mus = NULL;
 char real_fname[256];
 
 int musicPlayerStart(void *this, char *fname, int unk, float vol, int unk2) {
-	sceClibPrintf("musicPlayerStart %s %d %f\n", fname, unk, vol);
+	dlog("musicPlayerStart %s %d %f\n", fname, unk, vol);
 	sprintf(real_fname, "ux0:data/32secs/%s", fname);
 	real_fname[strlen(real_fname) - 3] = 0;
 	strcat(real_fname, "ogg");
@@ -2085,17 +2081,6 @@ void *pthread_main(void *arg) {
 	return NULL;
 }
 
-int get_urandom(int *this) {
-	FILE *f = fopen("ux0:data/urandom.txt", "w");
-	for (int i = 0; i < 1024; i++) {
-		uint32_t r = rand();
-		fwrite(f, 1, 4, &r);
-	}
-	fclose(f);
-	*this = open("ux0:data/urandom.txt", O_RDONLY, 0777);
-	return this;
-}
-
 int main(int argc, char *argv[]) {
 	SceAppUtilInitParam init_param;
 	SceAppUtilBootParam boot_param;
@@ -2134,7 +2119,7 @@ int main(int argc, char *argv[]) {
 		
 	sceClibPrintf("Loading libgame\n");
 	sprintf(fname, "%s/libgame.so", data_path);
-	if (so_file_load(&main_mod, fname, LOAD_ADDRESS + 0x01000000) < 0)
+	if (so_file_load(&main_mod, fname, LOAD_ADDRESS) < 0)
 		fatal_error("Error could not load %s.", fname);
 	so_relocate(&main_mod);
 	so_resolve(&main_mod, default_dynlib, sizeof(default_dynlib), 0);
@@ -2191,11 +2176,11 @@ int main(int argc, char *argv[]) {
 	*(uintptr_t *)(fake_env + 0x36C) = (uintptr_t)GetJavaVM;
 	*(uintptr_t *)(fake_env + 0x374) = (uintptr_t)GetStringUTFRegion;
 
-	pthread_t t2;
-	pthread_attr_t attr2;
-	pthread_attr_init(&attr2);
-	pthread_attr_setstacksize(&attr2, 2 * 1024 * 1024);
-	pthread_create(&t2, &attr2, pthread_main, NULL);
+	pthread_t t;
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setstacksize(&attr, 2 * 1024 * 1024);
+	pthread_create(&t, &attr, pthread_main, NULL);
 
 	return sceKernelExitDeleteThread(0);
 }
