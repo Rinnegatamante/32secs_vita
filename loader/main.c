@@ -1377,7 +1377,7 @@ static so_default_dynlib default_dynlib[] = {
 	// { "poll", (uintptr_t)&poll },
 	{ "pow", (uintptr_t)&pow },
 	{ "powf", (uintptr_t)&powf },
-	{ "printf", (uintptr_t)&printf },
+	{ "printf", (uintptr_t)&ret0 },
 	{ "pthread_join", (uintptr_t)&pthread_join_soloader },
 	{ "pthread_attr_destroy", (uintptr_t)&pthread_attr_destroy_soloader },
 	{ "pthread_attr_getstack", (uintptr_t)&pthread_attr_getstack_soloader },
@@ -1723,7 +1723,7 @@ void *CallStaticObjectMethodV(void *env, void *obj, int methodID, uintptr_t *arg
 	FILE *f;
 	switch (methodID) {
 	case CLOUD_GET_VALUE:
-		sceClibPrintf("cloudGetValue %s\n", args[0]);
+		dlog("cloudGetValue %s\n", args[0]);
 		sprintf(fname, "ux0:data/32secs/cloud/%s", args[0]);
 		f = sceLibcBridge_fopen(fname, "rb");
 		if (f) {
