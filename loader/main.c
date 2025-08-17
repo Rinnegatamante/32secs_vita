@@ -822,7 +822,7 @@ size_t AAsset_getLength(FILE *f) {
 }
 
 size_t AAsset_read(FILE *f, void *buf, size_t count) {
-	return fread(buf, 1, count, f);
+	return sceLibcBridge_fread(buf, 1, count, f);
 }
 
 size_t AAsset_seek(FILE *f, size_t offs, int whence) {
