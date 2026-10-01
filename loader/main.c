@@ -1590,9 +1590,9 @@ void CallStaticVoidMethodV(void *env, void *obj, int methodID, uintptr_t *args) 
 	FILE *f;
 	switch (methodID) {
 	case CLOUD_SET_VALUE:
-		sprintf(fname, "ux0:data/32secs/cloud/%s", args[0]);
+		sprintf(fname, "ux0:data/32secs/cloud/%s", (const char *)args[0]);
 		f = sceLibcBridge_fopen(fname, "wb");
-		sceLibcBridge_fwrite(args[1], 1, strlen(args[1]), f);
+		sceLibcBridge_fwrite((const char *)args[1], 1, strlen((const char *)args[1]), f);
 		sceLibcBridge_fclose(f);
 		break;
 	default:
@@ -1683,7 +1683,7 @@ int CallBooleanMethodV(void *env, void *obj, int methodID, uintptr_t *args) {
 void *CallObjectMethodV(void *env, void *obj, int methodID, uintptr_t *args) {
 	switch (methodID) {
 	default:
-		return 0x34343434;
+		return (void *)(uintptr_t)0x34343434;
 	}
 }
 
@@ -1724,7 +1724,7 @@ void *CallStaticObjectMethodV(void *env, void *obj, int methodID, uintptr_t *arg
 	switch (methodID) {
 	case CLOUD_GET_VALUE:
 		dlog("cloudGetValue %s\n", args[0]);
-		sprintf(fname, "ux0:data/32secs/cloud/%s", args[0]);
+		sprintf(fname, "ux0:data/32secs/cloud/%s", (const char *)args[0]);
 		f = sceLibcBridge_fopen(fname, "rb");
 		if (f) {
 			sceClibMemset(cloud_ret, 0, 1024);
